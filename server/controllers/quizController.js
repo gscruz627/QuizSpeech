@@ -1,18 +1,18 @@
 import express from "express"
-import Quiz from "../models/Quiz"
-import User from "../models/User"
-import { verifyToken } from "../middleware/verifyToken"
+import Quiz from "../models/Quiz.js"
+import User from "../models/User.js"
+import { optionalToken, verifyToken } from "../middleware/verifyToken.js"
 
 const quizController = express.Router();
 
-// If you are the user, return both public and private
-// Otherwise return only public 
-quizController.get("/user/:id", verifyToken, async (req, res) => {
-    const id = req.params["id"]
-    const userId = req.params["userId"] // User sending the request
-    const quizes = await Quiz.find({ userId: id })
+
+quizController.get("/user/:username", optionalToken, async (req, res) => {
+    const username = req.params["username"]
+    const userId = req.user.userId;
+    const user = await User.findOne({username: username})
+    let quizes = await Quiz.find({ owner: user._id})
     // If there is at least 1 quiz and you are not the owner return only public
-    if (quizes[0] && !(quizes[0].userId === userId)) {
+    if (quizes[0] && !(quizes[0].owner === userId)) {
         quizes = quizes.filter((quiz) => quiz.public === true)
     }
     // If you are the user return all.
@@ -21,28 +21,34 @@ quizController.get("/user/:id", verifyToken, async (req, res) => {
 
 quizController.get("/search/:term", async (req, res) => {
     const searchTerm = req.params["term"];
+    console.log(searchTerm)
+    // Create custom regex term where the term contains the term.
     const regexTerm = new RegExp(searchTerm, "i");
+    // Only return public quizes
     const quizes = await Quiz.find({ title: regexTerm, public: true });
     return res.status(200).json({ quizes: quizes })
 })
 
-quizController.get("/:id", async (req, res) => {
+quizController.get("/quiz/:id", optionalToken, async (req, res) => {
+    try{
     const id = req.params["id"];
-    const userId = req.headers["userId"];
+    const userId = req.user.userId
     const quiz = await Quiz.findById(id)
     if (!quiz) {
         return res.status(404).json({ message: "Not Found" })
     }
-    if ((quiz.public === False) && (quiz.userId !== userId)) {
+    // If this is a private quiz and you are not the user, return not found
+    if ((quiz.public === false) && (quiz.owner !== userId)) {
         return res.status(404).json({ message: "Not Found" })
     }
     const user = await User.findById(quiz.userId)
     return res.status(200).json({ quiz: quiz, user: user })
+} catch(err) { console.log(err) }
 })
 
 quizController.post("/create", verifyToken, (req, res) => {
     const title = req.body["title"]
-    const owner = req.body["userId"]
+    const owner = req.body["owner"]
     const modelPublic = req.body["public"]
     const questions = req.body["questions"]
     const answers = req.body["answers"]
@@ -78,6 +84,7 @@ quizController.put("/:id/add", verifyToken, async (req, res) => {
     if(!quiz){
         return res.status(404).json({message: "Not found"})
     }
+    // use .concat to join the new questions and answers
     quiz.questions.concat(newquestions);
     quiz.answers.concat(newanswers);
     quiz.save();
@@ -93,6 +100,7 @@ quizController.delete("/delete", verifyToken, async (req, res) => {
     if(!quiz){
         return res.status(404).json({message: "Not Found"})
     }
+    // Delete the indexes and splice the questions and answers at those indexes.
     while (questionsIndexes.length > 0) {
         const index = questionsIndexes.pop();
         quiz.questions.splice(index, 1);
@@ -101,5 +109,7 @@ quizController.delete("/delete", verifyToken, async (req, res) => {
     quiz.save();
     res.status(200).json({quiz: quiz})
 })
+
+export default quizController;
 
 // ADD documentation, add try catch on all

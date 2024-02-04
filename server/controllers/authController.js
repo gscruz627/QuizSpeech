@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken"
 import express from "express";
-import { genSalt, genSaltSync, hash, hashSync, compareSync} from "bcrypt";
+import { genSalt, genSaltSync, hash, hashSync, compareSync, compare} from "bcrypt";
 
 const authController = express.Router();
 const JWT_SECRET=process.env.JWT_SECRET;
@@ -17,7 +17,6 @@ authController.post("/register", async (req, res) => {
     });
     newUser.save();
     res.status(201).json({message: "Sucsess"})
-
 })
 
 authController.post("/login", async (req, res) => {
@@ -31,7 +30,7 @@ authController.post("/login", async (req, res) => {
     if (!check){
         return res.status(403).json({message: "Invalid credentials"});
     }
-    const token = jwt.sign({id: user._id}, process.env.JWT_SECRET);
+    const token = jwt.sign({userId: user._id, username: user.username, password: user.password}, process.env.JWT_SECRET);
     res.status(200).json({user: user, token: token});
 })
 
