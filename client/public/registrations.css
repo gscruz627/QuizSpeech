@@ -1,0 +1,38 @@
+.registration-box{
+    background-color:#FFF;
+    border: 1px solid gray;
+    border-radius:5px;
+    padding:2rem;
+    text-align: center;
+    width: min(90%, 450px);
+    margin: 3rem auto;
+}
+.registration-box >*{
+    margin: 1rem auto;
+}
+.registration-box lable, .registration-box input{
+    display:block;
+}
+input[type=text]:not(.search-bar), input[type=password]{
+    border-radius:5px;
+    box-shadow: inset 0 0 5px rgb(172, 172, 172);
+    width:100%;
+    padding: 1rem 2rem;
+}
+.box-button{
+    background-color: rgb(62, 133, 239);
+    color:#FFF;
+    padding: 1rem 2rem;
+    border-radius:5px;
+}
+
+.error-box{
+    border: 1px solid rgb(252, 154, 154);
+    background-color: rgb(247, 224, 228);
+    padding: 1rem 2rem;
+    border-radius: 5px;
+}
+
+@media screen and (max-width:768px){
+    
+}

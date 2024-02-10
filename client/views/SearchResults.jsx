@@ -8,34 +8,48 @@ const SearchResults = () => {
     const [searchParams, setSearchParams] = useSearchParams()
     const SERVER_URL = import.meta.env["VITE_SERVER_URL"]
     const term = searchParams.get("q")
-    const quizes = useSelector( (state) => state.quizes)
+    const quizes = useSelector((state) => state.quizes)
     const dispatch = useDispatch()
     const handleSearch = async () => {
         const request = await fetch(`${SERVER_URL}/search/${term}`)
         const requestJSON = await request.json()
-        if (request.ok){
-          dispatch(setQuizes({quizes:requestJSON["quizes"]}))
-          return
+        if (request.ok) {
+            dispatch(setQuizes({ quizes: requestJSON["quizes"] }))
+            return
         }
-        dispatch(setQuizes({quizes: []}))
+        dispatch(setQuizes({ quizes: [] }))
         return
-      }
-    useEffect( () => {
+    }
+    useEffect(() => {
         handleSearch()
     }, [])
 
     return (
         <>
-        <Navbar/>
-        <h1>Search results for {term}</h1>
+            <Navbar />
+            <section>
+                <h1 style={{ textAlign: "center" }}>Search results for "{term}"</h1>
 
-        {(quizes && quizes.length>0)  ? (
-            quizes.map( (quiz) => (
-                <Link to={`/quiz/${quiz._id}`}>{quiz.title}</Link>
-            ))
-        ) : (
-            <p>No quizes found</p>
-        )}
+                <div className='profile-container'>
+                    <ul>
+                        {(quizes && quizes.length > 0) ? (
+                            quizes.map((quiz) => (
+                                <li>
+                                    <Link to={`/quiz/${quiz._id}`}>{quiz.title}</Link>
+                                    <hr/>
+                                    {quiz.questions.map((question, i) => (
+                                        (i < 3) && (
+                                            <small> <i className="fa-solid fa-caret-right"></i> {question}</small>
+                                        )
+                                    ))}
+                                </li>
+                            ))
+                        ) : (
+                            <p>No quizes found</p>
+                        )}
+                    </ul>
+                </div>
+            </section>
         </>
     )
 }

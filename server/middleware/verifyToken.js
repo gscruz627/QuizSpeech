@@ -24,10 +24,10 @@ export const optionalToken = async (req, res, next) => {
     const JWT_SECRET = process.env.JWT_SECRET;
     try {
         let token = req.header("Authentication");
-        if (!token) {
+        if ( token === "undefined"){
             next();
             return;
-        };
+        }
 
         if (token && token.startsWith("Bearer ")) {
             token = token.slice(7, token.length).trimLeft();

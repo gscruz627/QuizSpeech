@@ -12,12 +12,20 @@ const CreateQuiz = () => {
     const [currentAnswer, setCurentAnswer] = useState("");
     const [questions, setQuestions] = useState([]);
     const [answers, setAnswers] = useState([]);
-    const token = useSelector( (state) => state.token);
-    const user = useSelector( (state) => state.user)
+    const token = useSelector((state) => state.token);
+    const user = useSelector((state) => state.user)
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(title.length < 3){
+            alert("Need at least 3 characters in title")
+            return
+        }
+        if (questions.length < 1){
+            alert("Need at least 1 question")
+            return
+        }
         if (questions.length !== answers.length) {
             alert("You are missing an answer to the last question!")
             return
@@ -25,8 +33,8 @@ const CreateQuiz = () => {
         const request = await fetch(`${SERVER_URL}/create`, {
             method: "POST",
             headers: {
-                "Authentication" : `Bearer ${token}`,
-                "Content-Type" : "application/json"
+                "Authentication": `Bearer ${token}`,
+                "Content-Type": "application/json"
             },
             body: JSON.stringify({
                 title: title,
@@ -37,7 +45,7 @@ const CreateQuiz = () => {
             })
         })
         const requestJSON = await request.json();
-        if(request.ok){
+        if (request.ok) {
             navigate(`/profile/${user.username}/`)
             return
         }
@@ -48,11 +56,11 @@ const CreateQuiz = () => {
     return (
         <>
             <Navbar />
-            <div>
-                <h1>Create a new Quiz</h1>
-                <form onSubmit={(e) => handleSubmit(e)}>
+            <section>
+                <h1 style={{ textAlign: "center" }}>Create a new Quiz</h1>
+                <form onSubmit={(e) => handleSubmit(e)} className="create-quiz-form">
                     <label htmlFor="title">Title:</label>
-                    <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <input required type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} />
 
                     <label htmlFor="public">Can everyone see this quiz? (public) </label>
                     <input type="checkbox" id="public" checked={publicVal} onChange={(e) => setPublicVal(!publicVal)} />
@@ -60,7 +68,7 @@ const CreateQuiz = () => {
                     <label htmlFor="newquestion">Add a new question:</label>
                     <input type="text" id="newquestion" value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} disabled={questions.length > answers.length} />
 
-                    <button type="button" onClick={() => {
+                    <button className="mini-box-button" type="button" onClick={() => {
                         setQuestions([...questions, currentQuestion]); setCurrentQuestion("")
                     }
                     }>
@@ -69,27 +77,29 @@ const CreateQuiz = () => {
 
                     <ul>
                         {questions.map((question, i) => (
-                            <li key={i} >{question}</li>
+                            <small> <i className="fa-solid fa-caret-right"></i> {question}</small>
+
                         ))}
                     </ul>
 
                     <label htmlFor="newanswer">Add a new answer: </label>
                     <input type="text" id="newanswer" value={currentAnswer} onChange={(e) => setCurentAnswer(e.target.value)} disabled={questions.length <= answers.length} />
 
-                    <button type="button" onClick={() => {
+                    <button className="mini-box-button" type="button" onClick={() => {
                         setAnswers([...answers, currentAnswer]); setCurentAnswer("");
                     }}>
                         Add
                     </button>
                     <ul>
                         {answers.map((answer, i) => (
-                            <li key={i}>{answer}</li>
+                            <small> <i className="fa-solid fa-caret-right"></i> {answer}</small>
+
                         ))}
                     </ul>
 
-                    <button type="submit">Create</button>
+                    <button className="box-button" type="submit">Create</button>
                 </form>
-            </div>
+            </section>
         </>
     )
 }

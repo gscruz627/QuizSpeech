@@ -7,6 +7,11 @@ import CreateQuiz from '../views/CreateQuiz'
 import Profile from '../views/Profile'
 import SearchResults from "../views/SearchResults"
 import { useSelector } from "react-redux"
+import "../public/styles.css"
+import "../public/navigation.css"
+import "../public/registrations.css"
+import "../public/profile.css"
+import "../public/quiz.css"
 
 function App() {
 

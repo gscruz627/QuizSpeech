@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams, Link } from 'react-router-dom'
-import { setQuizes } from '../store'
+import { setQuiz, setQuizes } from '../store'
 import Navbar from '../components/Navbar'
 
 const Profile = () => {
@@ -16,7 +16,7 @@ const Profile = () => {
     const handleLoadUserData = async () => {
         const request = await fetch(`${SERVER_URL}/user/${username}`, {
             headers: {
-                "Authentication": isOwner ? token : null
+                "Authentication": token ? `Bearer ${token}` : undefined
             }
         })
         const requestJSON = await request.json();
@@ -27,26 +27,85 @@ const Profile = () => {
         }
         return
     }
+    const handleEdit = async (title, id) => {
+        if (!isOwner) return;
+        const newTitle = prompt("Rename this quiz", title)
+        const request = await fetch(`${SERVER_URL}/rename`, {
+            method: "PUT",
+            headers: {
+                "Authentication": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: id,
+                title: newTitle
+            })
+        })
+        const requestJSON = await request.json();
+        if (request.ok) {
+            dispatch(setQuiz({ quiz: requestJSON["quiz"] }))
+            return
+        }
+        alert("Server Error")
+        return
+    }
+    const handleDelete = async (title, id) => {
+        if (!isOwner) return;
+        const confirmed = confirm(`Are you sure you will delete this quiz: ${title}?`)
+        if (!confirmed) return;
+        const request = await fetch(`${SERVER_URL}/delete`, {
+            method: "DELETE",
+            headers: {
+                "Authentication": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: id,
+                userId: user._id
+            })
+        })
+        const requestJSON = await request.json();
+        if (request.ok) {
+            dispatch(setQuizes({ quizes: requestJSON["quizes"] }))
+            return
+        }
+        alert("Server Error")
+        return
+
+    }
     useEffect(() => {
         handleLoadUserData();
     }, [])
     return (
         <>
             <Navbar />
-            {userDoesNotExist ? (
-                <p> User Could not be found</p>
-            ) : (
-                <>
-                    <h1>{isOwner ? `Hello ${user.username}` : `${username}s profile and quizes`}</h1>
-                    <ul>
-                        {quizes ? quizes.map((quiz) => (
-                            <li>
-                                <Link to={`/quiz/${quiz._id}`}>{quiz.title}</Link>
-                            </li>
-                        )) : <p>No quizes to show</p>}
-                    </ul>
-                </>
-            )}
+            <section>
+                {userDoesNotExist ? (
+                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
+                        <i style={{ fontSize: "72px" }} class="fa-regular fa-face-frown-open"></i>
+                        <p>User Could not be found</p>
+                    </div>
+                ) : (
+                    <>
+                        <h1 style={{textAlign:"center"}}>{isOwner ? `${user.username} (Your Profile)` : `${username}'s profile and quizes`}</h1>
+                        <div className="profile-container">
+                            <ul>
+                                {quizes ? quizes.map((quiz) => (
+                                    <li>
+                                        <Link to={`/quiz/${quiz._id}`}>{quiz.title}</Link> {isOwner && <><i onClick={() => handleEdit(quiz.title, quiz._id)} className="fa-solid fa-pencil"></i> <i onClick={() => handleDelete(quiz.title, quiz._id)} className="fa-solid fa-trash"></i></>}
+                                        <hr/>
+                                        {quiz.questions.map( (question, i) => (
+                                            (i < 3) && (
+                                                <small> <i className="fa-solid fa-caret-right"></i> {question}</small>
+                                            )
+                                        ))}
+                                    </li>
+                                )) : <p>No quizes to show</p>}
+                            </ul>
+                        </div>
+                    </>
+                )}
+            </section>
         </>
     )
 }

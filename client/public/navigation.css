@@ -1,0 +1,71 @@
+nav {
+    height: 100vh;
+    min-height:100%;
+    background-color: rgb(63, 83, 101);
+    text-align: center;
+    padding: 2rem 0;
+}
+
+nav form>input[type=text],
+nav ul li {
+    width: 100%;
+    height: 50px;
+}
+
+nav ul li:hover {
+    background-color: rgb(93, 123, 150);
+    box-shadow: inset 0 0 15px rgb(63,83,101);
+    cursor: pointer;
+}
+
+nav ul {
+    display: flex;
+    flex-direction: column;
+}
+
+nav ul li {
+    display: flex;
+    align-items: center;
+    padding-left: 2rem;
+    gap: 25px;
+}
+
+nav,
+nav a {
+    color: #FFF;
+}
+nav ul li p i{
+    margin-right:1.5rem;
+}
+nav div:last-child form input[type=text] {
+    background-color: rgb(36, 56, 74);
+    box-shadow: inset 0 0 15px #131a31;
+    color: #FFF;
+    padding: 0 2rem;
+}
+
+nav div:last-child form input[type=text]::placeholder {
+    color: #FFF;
+}
+
+@media screen and (max-width:768px){
+    .App{
+        grid-template-columns: 100%;
+    }
+    nav{
+        height:auto;
+        min-height: none;
+    }
+    nav div:first-child{
+        display:flex;
+        justify-content: center;
+        gap:2.5rem;
+        margin-bottom:2rem;
+    }
+    nav img{
+        width:75px;
+    }
+    nav ul{
+        display:grid
+    }
+}
