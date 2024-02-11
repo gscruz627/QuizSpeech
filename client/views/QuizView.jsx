@@ -1,36 +1,28 @@
-// TRY YOUR HARDEST TO FIND ANY NON-OWNER ISSUE
-// PUBLISH.
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
-import { setQuizes } from '../store'
 
 const QuizView = () => {
+
     const SERVER_URL = import.meta.env["VITE_SERVER_URL"]
+    const speech = new SpeechSynthesisUtterance();
+
     const [quiz, setQuiz] = useState(null)
-    const [isStart, setIsStart] = useState(false)
-    const [currentIdx, setCurrentIdx] = useState(0);
-    const [isShowAnswer, setIsShowAnswer] = useState(false)
     const [reqUser, setReqUser] = useState("")
+    const [isOwner, setIsOwner] = useState(false);
+    const [isStart, setIsStart] = useState(false)
+    const [addAnswer, setAddAnswer] = useState("");
+    const [currentIdx, setCurrentIdx] = useState(0);
+    const [addQuestion, setAddQuestion] = useState("");
+    const [isShowAnswer, setIsShowAnswer] = useState(false)
     const [isShowQuestions, setIsShowQuestions] = useState(false);
     const [isReadyToCreateQuestion, setIsReadyToCreateQuestion] = useState(false);
-    const [addQuestion, setAddQuestion] = useState("");
-    const [addAnswer, setAddAnswer] = useState("");
+    
     const { quizId } = useParams();
-    const token = useSelector((state) => state.token)
     const navigate = useNavigate();
-    const speech = new SpeechSynthesisUtterance();
+    const token = useSelector((state) => state.token)
     const user = useSelector((state) => state.user)
-    const [isOwner, setIsOwner] = useState(false);
 
     const handleLoadQuizData = async () => {
         const request = await fetch(`${SERVER_URL}/quiz/${quizId}`, {

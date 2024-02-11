@@ -44,7 +44,6 @@ const CreateQuiz = () => {
                 answers: answers,
             })
         })
-        const requestJSON = await request.json();
         if (request.ok) {
             navigate(`/profile/${user.username}/`)
             return
@@ -66,7 +65,7 @@ const CreateQuiz = () => {
                     <input type="checkbox" id="public" checked={publicVal} onChange={(e) => setPublicVal(!publicVal)} />
 
                     <label htmlFor="newquestion">Add a new question:</label>
-                    <input type="text" id="newquestion" value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} disabled={questions.length > answers.length} />
+                    <input type="text" min="1" id="newquestion" value={currentQuestion} onChange={(e) => setCurrentQuestion(e.target.value)} disabled={questions.length > answers.length} />
 
                     <button className="mini-box-button" type="button" onClick={() => {
                         setQuestions([...questions, currentQuestion]); setCurrentQuestion("")
@@ -77,13 +76,13 @@ const CreateQuiz = () => {
 
                     <ul>
                         {questions.map((question, i) => (
-                            <small> <i className="fa-solid fa-caret-right"></i> {question}</small>
+                            <small style={{display: "block"}}> <i className="fa-solid fa-caret-right"></i> {question}</small>
 
                         ))}
                     </ul>
 
                     <label htmlFor="newanswer">Add a new answer: </label>
-                    <input type="text" id="newanswer" value={currentAnswer} onChange={(e) => setCurentAnswer(e.target.value)} disabled={questions.length <= answers.length} />
+                    <input type="text" min="1" id="newanswer" value={currentAnswer} onChange={(e) => setCurentAnswer(e.target.value)} disabled={questions.length <= answers.length} />
 
                     <button className="mini-box-button" type="button" onClick={() => {
                         setAnswers([...answers, currentAnswer]); setCurentAnswer("");
@@ -92,7 +91,7 @@ const CreateQuiz = () => {
                     </button>
                     <ul>
                         {answers.map((answer, i) => (
-                            <small> <i className="fa-solid fa-caret-right"></i> {answer}</small>
+                            <small style={{display: "block"}}> <i className="fa-solid fa-caret-right"></i> {answer}</small>
 
                         ))}
                     </ul>
